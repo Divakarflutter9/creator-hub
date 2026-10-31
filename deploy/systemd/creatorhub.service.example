@@ -1,0 +1,38 @@
+[Unit]
+Description=CreatorHub Django web application
+After=network.target
+
+[Service]
+Type=notify
+User=creatorhub
+Group=creatorhub
+WorkingDirectory=/srv/creatorhub/app
+EnvironmentFile=/etc/creatorhub/creatorhub.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStartPre=/srv/creatorhub/app/.venv/bin/python manage.py check --deploy
+ExecStart=/srv/creatorhub/app/.venv/bin/gunicorn creatorhub.wsgi:application --bind 127.0.0.1:8017 --workers 2 --threads 2 --timeout 120 --graceful-timeout 30 --access-logfile - --error-logfile - --capture-output
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=40
+KillSignal=SIGQUIT
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/var/lib/creatorhub/private
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

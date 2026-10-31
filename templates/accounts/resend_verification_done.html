@@ -1,0 +1,1 @@
+{% extends "accounts/auth_simple.html" %}{% block auth_title %}Check your email{% endblock %}{% block auth_subtitle %}If that address has an unconfirmed account, a new confirmation link is on its way.{% endblock %}{% block auth_form %}<a href="{% url 'accounts:login' %}">Back to log in</a>{% endblock %}

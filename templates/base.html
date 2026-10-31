@@ -1,0 +1,3 @@
+{% load static %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#faf9f6"><title>{% block title %}CreatorHub — Your resources, beautifully delivered{% endblock %}</title><meta name="description" content="A home for the resources you share with your audience."><link rel="stylesheet" href="{% static 'css/site.css' %}">{% block head %}{% endblock %}</head>
+<body>{% if messages %}<div class="messages" aria-live="polite">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% block content %}{% endblock %}</body></html>

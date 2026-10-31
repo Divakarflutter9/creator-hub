@@ -1,0 +1,26 @@
+[Unit]
+Description=Back up CreatorHub PostgreSQL data and private files
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=creatorhub
+Group=creatorhub
+WorkingDirectory=/srv/creatorhub/app
+EnvironmentFile=/etc/creatorhub/creatorhub.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/bin/bash /srv/creatorhub/app/deploy/scripts/backup_creatorhub.sh
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadOnlyPaths=/var/lib/creatorhub/private
+ReadOnlyPaths=/var/lib/creatorhub/.pgpass
+ReadWritePaths=/var/backups/creatorhub

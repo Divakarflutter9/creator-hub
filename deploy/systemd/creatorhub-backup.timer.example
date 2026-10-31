@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily CreatorHub backup timer
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=45m
+Persistent=true
+Unit=creatorhub-backup.service
+
+[Install]
+WantedBy=timers.target

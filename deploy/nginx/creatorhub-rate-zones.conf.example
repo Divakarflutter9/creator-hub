@@ -1,0 +1,4 @@
+# Add this include inside nginx's existing `http { ... }` block.
+# Keep the existing server blocks unchanged. Validate with `nginx -t` before reload.
+limit_req_zone $binary_remote_addr zone=creatorhub_auth:10m rate=10r/m;
+limit_req_zone $binary_remote_addr zone=creatorhub_sensitive:10m rate=60r/m;
