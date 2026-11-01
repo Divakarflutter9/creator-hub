@@ -1,1 +1,39 @@
-{% extends "dashboard/base.html" %}{% block title %}My resources | CreatorHub{% endblock %}{% block crumb %}My resources{% endblock %}{% block dashboard_content %}<div class="page-heading"><div><h1>My resources</h1><p>Your guides, downloads, and links — all in one place.</p></div><a class="button button-dark" href="{% url 'resources:create' %}">＋ Add resource</a></div><section class="panel resources-panel" style="margin-top:0">{% if resources %}<table class="resource-table"><thead><tr><th>Resource</th><th>Status</th><th>Created</th><th>Public link</th><th></th></tr></thead><tbody>{% for resource in resources %}<tr><td><div class="table-resource"><span class="doc-icon">▤</span><div><strong>{{ resource.title }}</strong><span>{{ resource.original_file_name }}</span></div></div></td><td><span class="status-pill {% if resource.status != 'published' %}draft{% endif %}">{{ resource.get_status_display }}</span></td><td>{{ resource.created_at|date:"M j, Y" }}</td><td>{% if resource.status == 'published' %}<a href="{% url 'resources:public' resource.slug %}" target="_blank" rel="noopener">Open ↗</a>{% else %}Not public{% endif %}</td><td><a href="{% url 'resources:edit' resource.id %}">Edit</a></td></tr>{% endfor %}</tbody></table>{% else %}<div class="empty-state"><span class="empty-state-icon">▤</span><h3>No resources yet</h3><p>Add your first resource to create a link you can share with your audience.</p><a class="button button-dark" href="{% url 'resources:create' %}">＋ Add resource</a></div>{% endif %}</section>{% endblock %}
+{% extends "dashboard/base.html" %}
+{% block title %}My resources | CreatorHub{% endblock %}
+{% block crumb %}My resources{% endblock %}
+{% block dashboard_content %}
+<div class="page-heading">
+  <div><h1>My resources</h1><p>Your guides, downloads, and links — all in one place.</p></div>
+  <a class="button button-dark" href="{% url 'resources:create' %}">＋ Add resource</a>
+</div>
+<section class="panel resources-panel" style="margin-top:0">
+  {% if resources %}
+  <table class="resource-table">
+    <thead><tr><th>Resource</th><th>Status</th><th>Created</th><th>Public link</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for resource in resources %}
+      <tr>
+        <td><div class="table-resource"><span class="doc-icon">▤</span><div><strong>{{ resource.title }}</strong><span>{{ resource.original_file_name }}</span></div></div></td>
+        <td><span class="status-pill {% if resource.status != 'published' %}draft{% endif %}">{{ resource.get_status_display }}</span></td>
+        <td>{{ resource.created_at|date:"M j, Y" }}</td>
+        <td>
+          {% if resource.status == 'published' %}
+          <a href="{% url 'resources:public' resource.slug %}" target="_blank" rel="noopener">Open ↗</a>
+          {% else %}<span class="muted-cell">Publish to share</span>{% endif %}
+        </td>
+        <td><div class="resource-actions">
+          {% if resource.status == 'published' %}
+          <button class="button button-outline button-small copy-resource-link" type="button" data-copy-url="{{ request.scheme }}://{{ request.get_host }}{% url 'resources:public' resource.slug %}">Copy link</button>
+          {% endif %}
+          <a class="button button-outline button-small" href="{% url 'resources:managed_download' resource.id %}">Download</a>
+          <a class="resource-edit-link" href="{% url 'resources:edit' resource.id %}">Edit</a>
+        </div></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><span class="empty-state-icon">▤</span><h3>No resources yet</h3><p>Add your first resource to create a link you can share with your audience.</p><a class="button button-dark" href="{% url 'resources:create' %}">＋ Add resource</a></div>
+  {% endif %}
+</section>
+{% endblock %}

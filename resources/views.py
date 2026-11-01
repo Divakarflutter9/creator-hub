@@ -27,6 +27,20 @@ def download_resource(request, slug):
     response["X-Content-Type-Options"] = "nosniff"
     return response
 
+@login_required
+@require_http_methods(["GET"])
+def download_managed_resource(request, resource_id):
+    workspace = get_workspace_for_user(request.user)
+    resource = get_object_or_404(Resource, pk=resource_id, workspace=workspace)
+    try:
+        file_handle = resource.file.open("rb")
+    except (FileNotFoundError, OSError):
+        raise Http404("This file is currently unavailable.")
+    response = FileResponse(file_handle, as_attachment=True, filename=resource.original_file_name, content_type="application/octet-stream")
+    response["Cache-Control"] = "private, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
+
 @require_POST
 def report_resource(request, slug):
     resource = get_object_or_404(Resource.objects.filter(status=Resource.PUBLISHED), slug=slug)
