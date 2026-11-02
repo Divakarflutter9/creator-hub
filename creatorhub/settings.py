@@ -153,6 +153,7 @@ SECURE_HSTS_SECONDS = 0 if DEBUG else int(os.environ.get("DJANGO_HSTS_SECONDS", 
 SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get("DJANGO_HSTS_INCLUDE_SUBDOMAINS", "0").lower() in {"1", "true", "yes"}
 SECURE_HSTS_PRELOAD = os.environ.get("DJANGO_HSTS_PRELOAD", "0").lower() in {"1", "true", "yes"}
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 2
+SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "divakarway@gmail.com")
 
 LOGGING = {
     "version": 1,

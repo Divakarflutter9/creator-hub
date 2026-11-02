@@ -28,9 +28,9 @@ free -h
 systemctl --type=service --state=running
 ```
 
-Check that `creatorhub.example.com` is not already assigned to another virtual host and that `127.0.0.1:8017` is unused. If that port is occupied, choose another unused loopback port and change it in both the systemd and Nginx examples. Confirm you have backups and a rollback window for the Nginx configuration.
+Check that `creatorhub.fastcopies.in` is not already assigned to another virtual host and that `127.0.0.1:8017` is unused. If that port is occupied, choose another unused loopback port and change it in both the systemd and Nginx examples. Confirm you have backups and a rollback window for the Nginx configuration.
 
-Use a dedicated hostname such as `creatorhub.example.com` or `resources.example.com`; avoid hosting it at `/` on a hostname already serving another site. Add only that hostname's DNS record, pointing to this VPS. Leave existing DNS records alone.
+Use the configured dedicated hostname `creatorhub.fastcopies.in`; avoid hosting it at `/` on a hostname already serving another site. Confirm its DNS A record points to `173.249.38.225`. Leave existing DNS records alone.
 
 If traffic passes through Cloudflare or another proxy/CDN, tell me before deploying or configure Nginx's real-IP module using only that provider's published proxy IP ranges. Do not trust arbitrary `X-Forwarded-For` values; the rate-limit examples key on the IP Nginx sees.
 
@@ -85,7 +85,7 @@ sudo install -o root -g creatorhub -m 0640 /srv/creatorhub/app/deploy/creatorhub
 sudoedit /etc/creatorhub/creatorhub.env
 ```
 
-Set the real hostname in `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS`, the PostgreSQL role/database/password, persistent `PRIVATE_MEDIA_ROOT`, and real SMTP settings. Set `DJANGO_SECRET_KEY` from a fresh random value, for example:
+Set the PostgreSQL role/database/password, persistent `PRIVATE_MEDIA_ROOT`, and real SMTP settings. The example already uses `creatorhub.fastcopies.in` for the allowed host and CSRF origin. Set `DJANGO_SECRET_KEY` from a fresh random value, for example:
 
 ```bash
 sudo -u creatorhub /srv/creatorhub/app/.venv/bin/python -c 'import secrets; print(secrets.token_urlsafe(64))'
@@ -138,7 +138,7 @@ Verify the app is bound only to loopback and that its database-backed health end
 
 ```bash
 sudo ss -ltnp | grep ':8017'
-curl -fsS -H 'Host: creatorhub.example.com' http://127.0.0.1:8017/healthz/
+curl -fsS -H 'Host: creatorhub.fastcopies.in' http://127.0.0.1:8017/healthz/
 ```
 
 The health response should be `ok`. If not, inspect only `journalctl -u creatorhub`; don't restart PostgreSQL, Nginx, or any existing site's service to troubleshoot CreatorHub.
@@ -177,7 +177,7 @@ After DNS resolves to this server and the temporary HTTP vhost is active, obtain
 
 ```bash
 sudo install -d -o root -g root -m 0755 /var/lib/letsencrypt/.well-known/acme-challenge
-sudo certbot certonly --webroot -w /var/lib/letsencrypt -d creatorhub.example.com --email you@example.com --agree-tos --non-interactive
+sudo certbot certonly --webroot -w /var/lib/letsencrypt -d creatorhub.fastcopies.in --email you@example.com --agree-tos --non-interactive
 ```
 
 Copy `deploy/nginx/creatorhub-https.conf.example` over the **same CreatorHub-only site file**, replace its hostname, and verify the certificate paths match Certbot's result. Keep the existing HTTP challenge location and redirect in that vhost. Then:
@@ -191,7 +191,7 @@ Confirm automatic renewal is enabled using your distribution's Certbot timer, an
 
 ## 8. Verify CreatorHub and leave other sites alone
 
-Check HTTPS, redirects, signup email delivery, static CSS, a creator upload/download, and `/healthz/`. A local pre-DNS/TLS test can use `curl --resolve creatorhub.example.com:443:127.0.0.1 https://creatorhub.example.com/` after the certificate and vhost are active. Confirm the upload limit is 25 MB and that no route serves `/var/lib/creatorhub/private` directly.
+Check HTTPS, redirects, signup email delivery, static CSS, a creator upload/download, and `/healthz/`. A local test can use `curl --resolve creatorhub.fastcopies.in:443:127.0.0.1 https://creatorhub.fastcopies.in/` after the certificate and vhost are active. Confirm the upload limit is 25 MB and that no route serves `/var/lib/creatorhub/private` directly.
 
 Check the other site's hostnames and health checks too. No firewall change is needed for Gunicorn: it remains on loopback, and Nginx uses the already-open 80/443 listeners with a distinct `server_name`.
 
@@ -202,7 +202,7 @@ Before an update, back up the CreatorHub database and private files. Install cod
 ```bash
 sudo systemctl reload creatorhub
 sudo systemctl status creatorhub --no-pager
-curl -fsS -H 'Host: creatorhub.example.com' http://127.0.0.1:8017/healthz/
+curl -fsS -H 'Host: creatorhub.fastcopies.in' http://127.0.0.1:8017/healthz/
 ```
 
 Gunicorn's HUP reload starts new workers and drains old workers gracefully; this avoids restarting Nginx for ordinary application releases. ([Gunicorn signal handling](https://docs.gunicorn.org/en/stable/signals.html))
@@ -231,9 +231,9 @@ Useful app-only diagnostics:
 ```bash
 sudo systemctl status creatorhub --no-pager
 sudo journalctl -u creatorhub -f
-curl -i -H 'Host: creatorhub.example.com' http://127.0.0.1:8017/healthz/
+curl -i -H 'Host: creatorhub.fastcopies.in' http://127.0.0.1:8017/healthz/
 ```
 
 ## Values to customize before deployment
 
-Replace `creatorhub.example.com`, `you@example.com`, the PostgreSQL credentials, SMTP values, certificate paths if nonstandard, filesystem paths, and port if `8017` is in use. Choose the Gunicorn worker count for available memory; the example starts with two workers to keep this app modest on a shared VPS.
+Replace `you@example.com`, the PostgreSQL credentials, SMTP values, certificate paths if nonstandard, filesystem paths, and port if `8017` is in use. Choose the Gunicorn worker count for available memory; the example starts with two workers to keep this app modest on a shared VPS.

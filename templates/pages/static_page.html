@@ -1,0 +1,2 @@
+{% extends "base.html" %}
+{% block content %}<main class="info-page"><a class="brand" href="{% url 'dashboard:home' %}"><span class="brand-mark">✳</span>CreatorHub</a><article class="info-card">{% block page_content %}{% endblock %}<p class="policy-contact">Questions? <a href="mailto:{{ support_email }}">{{ support_email }}</a></p></article></main>{% endblock %}

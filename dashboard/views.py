@@ -1,4 +1,5 @@
 from datetime import timedelta
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import connection, DatabaseError
 from django.db.models import Count, Q
@@ -10,6 +11,12 @@ from resources.models import Resource, ResourceEvent
 
 def home(request):
     return render(request, "home.html")
+
+def info_page(request, page):
+    if page not in {"about", "privacy", "terms", "contact", "content-guidelines"}:
+        from django.http import Http404
+        raise Http404
+    return render(request, f"pages/{page}.html", {"support_email": settings.SUPPORT_EMAIL})
 
 def health(request):
     try:

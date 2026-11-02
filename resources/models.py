@@ -19,6 +19,8 @@ class Resource(models.Model):
     slug = models.SlugField(max_length=80, unique=True)
     title = models.CharField(max_length=120)
     description = models.CharField(max_length=1000, blank=True)
+    article_body = models.TextField(blank=True, default="")
+    content_reviewed = models.BooleanField(default=False)
     status = models.CharField(max_length=12, choices=STATUS_CHOICES, default=DRAFT, db_index=True)
     file = models.FileField(upload_to=resource_upload_path, max_length=500)
     original_file_name = models.CharField(max_length=255)

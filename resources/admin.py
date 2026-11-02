@@ -3,8 +3,9 @@ from .models import AuditLog, Resource, ResourceEvent, ResourceReport
 
 @admin.register(Resource)
 class ResourceAdmin(admin.ModelAdmin):
-    list_display = ("title", "workspace", "status", "created_at")
-    list_filter = ("status", "created_at")
+    list_display = ("title", "workspace", "status", "content_reviewed", "created_at")
+    list_filter = ("status", "content_reviewed", "created_at")
+    list_editable = ("content_reviewed",)
     search_fields = ("title", "slug", "workspace__name")
     readonly_fields = ("id", "created_at", "updated_at", "file_size", "mime_type")
 

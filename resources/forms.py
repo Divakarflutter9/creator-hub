@@ -8,8 +8,15 @@ ALLOWED_TYPES = {".pdf", ".png", ".jpg", ".jpeg", ".zip", ".txt"}
 class ResourceForm(forms.Form):
     title = forms.CharField(min_length=2, max_length=120)
     description = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs={"rows": 4, "maxlength": 1000}))
+    article_body = forms.CharField(required=False, max_length=50000, widget=forms.Textarea(attrs={"rows": 18, "maxlength": 50000}))
     file = forms.FileField()
     visibility = forms.ChoiceField(choices=[("published", "Publish now — anyone with the link can view"), ("draft", "Save as draft — only visible to you")])
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("visibility") == "published" and not cleaned.get("article_body", "").strip():
+            self.add_error("article_body", "Add your original article before publishing this resource.")
+        return cleaned
 
     def clean_file(self):
         uploaded = self.cleaned_data.get("file")

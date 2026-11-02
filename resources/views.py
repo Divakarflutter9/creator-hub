@@ -12,7 +12,11 @@ from .models import AuditLog, Resource, ResourceEvent
 def public_resource(request, slug):
     resource = get_object_or_404(Resource.objects.select_related("workspace"), slug=slug, status=Resource.PUBLISHED)
     ResourceEvent.objects.create(workspace=resource.workspace, resource=resource, event_type=ResourceEvent.VIEW)
-    return render(request, "resources/public.html", {"resource": resource, "report_form": ResourceReportForm(), "report_sent": request.GET.get("report") == "sent"})
+    return render(request, "resources/public.html", {
+        "resource": resource,
+        "report_form": ResourceReportForm(),
+        "report_sent": request.GET.get("report") == "sent",
+    })
 
 @require_POST
 def download_resource(request, slug):
@@ -51,7 +55,10 @@ def report_resource(request, slug):
         report.save()
         messages.success(request, "Thanks for letting us know. Our team will review this resource.")
         return redirect("resources:public", slug=slug)
-    return render(request, "resources/public.html", {"resource": resource, "report_form": form}, status=400)
+    return render(request, "resources/public.html", {
+        "resource": resource,
+        "report_form": form,
+    }, status=400)
 
 def get_workspace_for_user(user):
     return Workspace.objects.filter(memberships__user=user, memberships__status=Membership.ACTIVE).distinct().first()
@@ -73,6 +80,7 @@ def resource_create(request):
                 created_by=request.user,
                 title=form.cleaned_data["title"],
                 description=form.cleaned_data["description"],
+                article_body=form.cleaned_data["article_body"],
                 original_file_name=uploaded.name[:255],
                 mime_type=mime_by_extension[Path(uploaded.name).suffix.lower()],
                 file_size=uploaded.size,
@@ -100,6 +108,7 @@ def resource_edit(request, resource_id):
         raise Http404("This resource is unavailable for editing.")
     form = ResourceEditForm(request.POST or None, request.FILES or None, initial={
         "title": resource.title, "description": resource.description,
+        "article_body": resource.article_body,
         "visibility": resource.status if resource.status in {Resource.DRAFT, Resource.PUBLISHED} else Resource.DRAFT,
     })
     if request.method == "POST" and form.is_valid():

@@ -1,9 +1,9 @@
 # Temporary site-specific HTTP vhost used only to obtain the first TLS certificate.
-# Replace the example hostname before enabling this file.
+# This file is specific to creatorhub.fastcopies.in.
 server {
     listen 80;
     listen [::]:80;
-    server_name creatorhub.example.com;
+    server_name creatorhub.fastcopies.in;
     server_tokens off;
     client_max_body_size 26m;
 
